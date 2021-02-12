@@ -19,6 +19,7 @@ Additional variables that can be used (either as `host_vars`/`group_vars` or via
 |-----------------------------------------|-----------------------------------------|
 | `aws_vpc_eip_profile`                   | Boto profile name to be used            |
 | `aws_vpc_eip_default_region`            | Default region to use                   |
+| `aws_vpc_eip_state`            | Default is `present`, possible values: `present` or `absent`. absent deletes the resource        |
 | `aws_vpc_eip_release_on_disassociation` | Release EIP upon disassociation         |
 | `aws_vpc_eip_reuse_existing_ip_allowed` | Reuse any unassociated EIP if it exists |
 

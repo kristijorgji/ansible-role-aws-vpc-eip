@@ -8,3 +8,11 @@
     loop_var: eip
   with_items:
     - "{{ aws_vpc_eips }}"
+  when: aws_vpc_eip_state == "present"
+
+- include_tasks: delete_eip.yml
+  loop_control:
+    loop_var: eip
+  with_items:
+    - "{{ aws_vpc_eips }}"
+  when: aws_vpc_eip_state == "absent"

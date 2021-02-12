@@ -1,0 +1,36 @@
+---
+
+# Returns:
+# * _aws_vpc_eip_facts
+- include_tasks: gather_facts.yml
+
+- name: fail if eip has multiple addresses
+  assert:
+    that:
+      - _aws_vpc_eip_facts.addresses | length <= 1
+    msg: The eip has multiple addresses {{ _aws_vpc_eip_facts }}
+
+- name: extract eip public_ip
+  set_fact:
+    _public_ip: "{{ _aws_vpc_eip_facts.addresses[0].public_ip }}"
+  when:
+    - _aws_vpc_eip_facts.addresses | length == 1
+
+###
+### create eip is deleted
+###
+- name: "ensure eip with public ip {{ _public_ip }} is deleted"
+  ec2_eip:
+    # Fixed values
+    state: absent
+    # Optional values
+    in_vpc: "{{ eip.in_vpc | default(aws_vpc_eip_in_vpc) }}"
+    public_ip: "{{ eip.public_ip | default(_public_ip) }}"
+    region: "{{ eip.region | default(aws_vpc_eip_default_region | default(omit)) }}"
+    aws_access_key: "{{ lookup('ENV', 'AWS_ACCESS_KEY') | default(omit) }}"
+    aws_secret_key: "{{ lookup('ENV', 'AWS_SECRET_KEY') | default(omit) }}"
+    security_token: "{{ lookup('ENV', 'AWS_SECURITY_TOKEN') | default(omit) }}"
+    profile: "{{ aws_vpc_eip_profile | default(omit) }}"
+  register: _aws_vpc_eip
+  when:
+    - _aws_vpc_eip_facts.addresses | length == 1
